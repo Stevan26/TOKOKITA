@@ -61,3 +61,10 @@ Route::middleware(['auth'])->group(function () {
         Route::put('/admin/pesanan/{id}', [PesananController::class, 'updateStatus'])->name('admin.pesanan.update');
     });
 });
+
+Route::get('/jalankan-migrasi', function () {
+    \Artisan::call('config:clear');
+    \Artisan::call('route:clear');
+    \Artisan::call('view:clear');
+    return "Semua cache kodingan dan view modul berhasil dibersihkan!";
+});
