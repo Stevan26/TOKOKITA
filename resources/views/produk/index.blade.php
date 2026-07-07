@@ -1,3 +1,4 @@
+@php use Illuminate\Support\Str; @endphp
 @extends('layouts.app')
 @section('title', 'Daftar Produk')
 
@@ -17,8 +18,13 @@
                 <div class="card h-100 shadow-sm">
                     <div class="card-body">
                         @if ($item->gambar)
-                            <img src="{{ asset('storage/produk/' . $item->gambar) }}" class="card-img-top mb-3"
-                                alt="Foto Produk" style="height: 200px; object-fit: cover;">
+                            @if (Str::startsWith($item->gambar, ['http://', 'https://']))
+                                <img src="{{ $item->gambar }}" class="card-img-top mb-3" alt="Foto Produk"
+                                    style="height: 200px; object-fit: cover;">
+                            @else
+                                <img src="{{ asset('storage/produk/' . $item->gambar) }}" class="card-img-top mb-3"
+                                    alt="Foto Produk" style="height: 200px; object-fit: cover;">
+                            @endif
                         @else
                             <img src="https://placehold.co/600x400?text=No+Image" class="card-img-top mb-3" alt="No Image"
                                 style="height: 200px; object-fit: cover;">
