@@ -6,7 +6,7 @@ use Illuminate\Http\Request;
 use App\Models\Produk;
 use Illuminate\Support\Facades\Storage;
 use Barryvdh\DomPDF\Facade\Pdf;
-use CloudinaryLabs\CloudinaryLaravel\Facades\Cloudinary; // WAJIB TAMBAHKAN INI
+use Cloudinary\Api\Upload\UploadApi; // MENGGUNAKAN SDK UTAMA CLOUDINARY SECARA LANGSUNG
 
 class ProdukController extends Controller
 {
@@ -32,9 +32,11 @@ class ProdukController extends Controller
 
         $imageUrl = null;
         if ($request->hasFile('gambar')) {
-            // Upload ke Cloudinary dan ambil URL permanennya
-            $uploadedFile = $request->file('gambar')->storeOnCloudinary('produk');
-            $imageUrl = $uploadedFile->getSecurePath();
+            // Bypass Laravel Service Container dengan memanggil engine SDK Cloudinary langsung
+            $response = (new UploadApi())->upload($request->file('gambar')->getRealPath(), [
+                'folder' => 'produk'
+            ]);
+            $imageUrl = $response['secure_url']; // Mengambil URL https langsung dari respons array
         }
 
         Produk::create([
@@ -42,7 +44,7 @@ class ProdukController extends Controller
             'harga'       => $request->harga,
             'deskripsi'   => $request->deskripsi,
             'stok'        => $request->stok,
-            'gambar'      => $imageUrl // Sekarang ini berisi link https://...
+            'gambar'      => $imageUrl
         ]);
 
         return redirect('/produk')->with('sukses', 'Produk baru berhasil ditambahkan!');
@@ -67,10 +69,10 @@ class ProdukController extends Controller
 
         $imageUrl = $produk->gambar;
         if ($request->hasFile('gambar')) {
-            // Karena menggunakan Cloudinary, kita tidak perlu menghapus file secara manual
-            // kecuali jika ingin menghemat kuota Cloudinary
-            $uploadedFile = $request->file('gambar')->storeOnCloudinary('produk');
-            $imageUrl = $uploadedFile->getSecurePath();
+            $response = (new UploadApi())->upload($request->file('gambar')->getRealPath(), [
+                'folder' => 'produk'
+            ]);
+            $imageUrl = $response['secure_url'];
         }
 
         $produk->update([
@@ -87,8 +89,6 @@ class ProdukController extends Controller
     public function destroy($id)
     {
         $produk = Produk::findOrFail($id);
-
-        // Hapus record dari database
         $produk->delete();
 
         return redirect('/produk')->with('sukses', 'Produk berhasil dihapus!');
