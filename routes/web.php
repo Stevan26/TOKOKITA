@@ -63,8 +63,14 @@ Route::middleware(['auth'])->group(function () {
 });
 
 Route::get('/jalankan-migrasi', function () {
+    // 1. Bersihkan semua jenis cache
     \Artisan::call('config:clear');
     \Artisan::call('route:clear');
     \Artisan::call('view:clear');
-    return "Semua cache kodingan dan view modul berhasil dibersihkan!";
+    \Artisan::call('cache:clear');
+
+    // 2. Jalankan ulang migrasi fresh agar tabel 'produk' terbuat ulang dengan bersih
+    \Artisan::call('migrate:fresh', ['--force' => true]);
+    
+    return "Selesai! Cache dibersihkan, CDN Bootstrap aktif, dan database telah di-reset fresh!";
 });
