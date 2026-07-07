@@ -63,5 +63,12 @@ Route::middleware(['auth'])->group(function () {
 });
 
 Route::get('/jalankan-migrasi', function () {
-    return "Selesai! Cache dibersihkan, CDN Bootstrap aktif, dan database telah di-reset fresh!";
+    // Membersihkan cache
+    \Artisan::call('config:clear');
+    \Artisan::call('view:clear');
+
+    // Membuat jembatan folder penyimpanan ke publik
+    \Artisan::call('storage:link');
+
+    return "Jembatan storage:link berhasil dibuat dan cache dibersihkan!";
 });
