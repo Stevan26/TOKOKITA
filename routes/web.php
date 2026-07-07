@@ -61,3 +61,8 @@ Route::middleware(['auth'])->group(function () {
         Route::put('/admin/pesanan/{id}', [PesananController::class, 'updateStatus'])->name('admin.pesanan.update');
     });
 });
+
+Route::get('/jalankan-migrasi', function () {
+    \Artisan::call('migrate:fresh', ['--force' => true]);
+    return "Database berhasil dimigrasikan dengan fresh!";
+});
