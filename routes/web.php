@@ -63,6 +63,14 @@ Route::middleware(['auth'])->group(function () {
 });
 
 Route::get('/jalankan-migrasi', function () {
+    // 1. Bersihkan cache konfigurasi secara total
+    \Artisan::call('config:clear');
+    \Artisan::call('cache:clear');
+
+    // 2. Jalankan ulang migrasi fresh
     \Artisan::call('migrate:fresh', ['--force' => true]);
-    return "Database berhasil dimigrasikan dengan fresh!";
+
+    // 3. Ambil dan tampilkan daftar tabel yang benar-benar ada di database
+    $tables = \DB::select('SHOW TABLES');
+    return response()->json($tables);
 });
