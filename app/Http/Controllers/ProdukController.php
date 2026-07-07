@@ -67,7 +67,7 @@ class ProdukController extends Controller
 
         $imageUrl = $produk->gambar;
         if ($request->hasFile('gambar')) {
-            // Karena menggunakan Cloudinary, kita tidak perlu menghapus file secara manual 
+            // Karena menggunakan Cloudinary, kita tidak perlu menghapus file secara manual
             // kecuali jika ingin menghemat kuota Cloudinary
             $uploadedFile = $request->file('gambar')->storeOnCloudinary('produk');
             $imageUrl = $uploadedFile->getSecurePath();
@@ -87,10 +87,10 @@ class ProdukController extends Controller
     public function destroy($id)
     {
         $produk = Produk::findOrFail($id);
-        
+
         // Hapus record dari database
         $produk->delete();
-        
+
         return redirect('/produk')->with('sukses', 'Produk berhasil dihapus!');
     }
 
